@@ -1,0 +1,6 @@
+{
+  "name": "WorkSpace FFE - Asset & Employee Tracking",
+  "description": "Furniture, Fixtures & Equipment Monitoring System for workplace asset tracking, custody management, and employee QR code badges.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
