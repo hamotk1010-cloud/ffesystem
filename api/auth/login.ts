@@ -35,16 +35,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     try {
       const result = await client.query('SELECT * FROM admin WHERE username = $1', [username]);
-      
+      client.release();
+
       if (result.rows.length === 0) {
-        client.release();
         return res.status(401).json({ error: 'Invalid username or password' });
       }
 
       const admin = result.rows[0];
       const isValid = bcrypt.compareSync(password, admin.password_hash);
-
-      client.release();
 
       if (!isValid) {
         return res.status(401).json({ error: 'Invalid username or password' });
