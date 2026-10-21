@@ -21,28 +21,22 @@ export async function query(text: string, params?: any[]) {
   }
 }
 
-// Ensure tables exist in Supabase
-export async function initSchema() {
-  await query(`
-    CREATE TABLE IF NOT EXISTS admin (
-      id SERIAL PRIMARY KEY,
-      username TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-  `);
-
-  // Seed default admin if missing
-  const adminCheck = await query('SELECT id FROM admin LIMIT 1');
-  if (adminCheck.rows.length === 0) {
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync('admin123', salt);
-    const now = new Date().toISOString();
-    await query(
-      'INSERT INTO admin (username, password_hash, updated_at) VALUES ($1, $2, $3) ON CONFLICT (username) DO NOTHING',
-      ['admin', hash, now]
-    );
+// Ensure default admin user exists in Supabase PostgreSQL
+async function initAdmin() {
+  try {
+    const res = await query('SELECT id FROM admin LIMIT 1');
+    if (res.rows.length === 0) {
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync('admin123', salt);
+      const now = new Date().toISOString();
+      await query(
+        'INSERT INTO admin (username, password_hash, updated_at) VALUES ($1, $2, $3) ON CONFLICT (username) DO NOTHING',
+        ['admin', hash, now]
+      );
+    }
+  } catch (err) {
+    console.error('Admin initialization note:', err);
   }
 }
 
-initSchema().catch(console.error);
+initAdmin();
